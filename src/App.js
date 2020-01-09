@@ -3,8 +3,7 @@ import './App.css';
 import styled from 'styled-components';
 import SpotifyWebAPI from 'spotify-web-api-js';
 import Header from './components/Header.jsx';
-import PlaylistForm from './components/PlaylistForm.jsx';
-import MoodForm from './components/MoodForm.jsx';
+import FormWrapper from './components/FormWrapper.jsx';
 import GoButton from './components/GoButton.jsx';
 import LogInButton from './components/LogInButton.jsx';
 
@@ -141,32 +140,35 @@ class App extends Component {
   }
 
   render() {
-    return (
-      <Wrapper className="App">
+    if(true) {
+      return (
+        <Wrapper className="App">
+          <Header loggedIn = {true} />
+          <FormWrapper />
+          <GoButton onClick = {() => this.addSongs()} />
+        </Wrapper>
+      );
+    } else {
+        return (
+          <Wrapper className="App">
+            <Header loggedIn = {false} />
+            <LogInButton />
+          </Wrapper>
+        );
+    }
+  }
+}
 
-                      <Header />
-        {/* <a href='http://localhost:8888'><LogInButton /></a> */}
-                      <LogInButton />
+export default App;
 
-            <PlaylistForm />  <MoodForm />
-
-                      <GoButton />
-
-
+        {/* TESTER CODE */}
         {/* <ul>
           {this.state.savedSongs.map(item => (
             <li>{item.name}</li>
           ))}
         </ul> */}
-
-        <button onClick = {() => this.classifyByMood(this.state.savedSongs[Math.floor(Math.random() * 100)])}>Classify Song</button>
-        <button onClick = {() => this.getPlaylists()}>Check Playlists</button>
-        <button onClick = {() => this.getSavedSongs(50, 0)}>Check Songs on Playlist</button>
-        <button onClick = {() => this.makeNewPlaylist()}>Make Playlist</button>
-        <button onClick = {() => this.addSongs()}>Add Song</button>
-      </Wrapper>
-    );
-  }
-}
-
-export default App;
+          {/* <button onClick = {() => this.classifyByMood(this.state.savedSongs[Math.floor(Math.random() * 100)])}>Classify Song</button>
+          <button onClick = {() => this.getPlaylists()}>Check Playlists</button>
+          <button onClick = {() => this.getSavedSongs(50, 0)}>Check Songs on Playlist</button>
+          <button onClick = {() => this.makeNewPlaylist()}>Make Playlist</button>
+          <button onClick = {() => this.addSongs()}>Add Song</button> */}
