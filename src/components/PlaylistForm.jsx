@@ -49,6 +49,7 @@ class PlaylistForm extends Component {
                   <Option value = ''>Choose a Playlist</Option>
                   <Option value="liked">Liked Songs</Option>
                   {this.props.titles.map(item => (
+                    //value will be item.id and item will be item.name
                     <Option value = {item}>{item}</Option>
                  ))}
                 </Form>

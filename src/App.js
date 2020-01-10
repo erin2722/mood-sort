@@ -41,12 +41,12 @@ class App extends Component {
       playlists: [ 
         {name: '', id: ''}
       ],
-      savedSongs: [
+      selectedPlaylistSongs: [
         {name: '', uri: '', id: '', mood: ''}
       ],
       recentPlaylistID: '',
       moods: new Map(), 
-      chosenPlaylist: ''
+      chosenPlaylist: {name: '', id: ''}
     }
 
     this.handleMoodChange = this.handleMoodChange.bind(this);
@@ -98,7 +98,7 @@ class App extends Component {
         var song;
         for(song of response.items) {
           this.setState(state => {
-            const savedSongs = state.savedSongs.concat({ 
+            const selectedPlaylistSongs = state.selectedPlaylistSongs.concat({ 
               name: song.track.name, 
               uri: song.track.uri,
               id: song.track.id,
@@ -106,16 +106,37 @@ class App extends Component {
             });
 
             return {
-              savedSongs
+              selectedPlaylistSongs
             }
           })
         }
-        if(this.state.savedSongs.length < response.total) this.getSavedSongs(limit, offset + 50); 
+        if(this.state.selectedPlaylistSongs.length < response.total) this.getSavedSongs(limit, offset + 50); 
       })
   }
 
-  makeNewPlaylist() {
-    spotifyWebAPI.createPlaylist(this.state.userID, {name: "heck yeah", description: "bet"})
+  getPlaylistSongs(playlistID) {
+    spotifyWebAPI.getPlaylistTracks('', playlistID)
+      .then((response) =>{
+        var song;
+        for(song of response.items) {
+          this.setState(state => {
+            const selectedPlaylistSongs = state.selectedPlaylistSongs.concat({ 
+              name: song.track.name, 
+              uri: song.track.uri,
+              id: song.track.id,
+              mood: this.classifyByMood(song.track)
+            });
+
+            return {
+              selectedPlaylistSongs
+            }
+          })
+        }
+      })
+  }
+
+  makeNewPlaylist(name) {
+    spotifyWebAPI.createPlaylist(this.state.userID, {name: name, description: "Created by mood-sort from " + this.state.chosenPlaylist + " playlist"})
       .then((response) =>{
         this.setState({
           recentPlaylistID: response.id
@@ -123,13 +144,11 @@ class App extends Component {
       });
   }
 
-  addSongs() {
-    //var song;
+  addSong(song, mood) {
+    //will replace with song.uri
     var songs = ['spotify:track:5u431x19PX588bk9XGlwN8'];
-    // for(song of this.state.savedSongs) {
-    //   songs.concat(song.uri);
-    // }
 
+    //will replace random id with mood playlist id
     spotifyWebAPI.addTracksToPlaylist('', '4u3BK21IWkEpcd8ydK7liu', songs)
       .then((response) => {
         console.log(response);
@@ -139,6 +158,7 @@ class App extends Component {
 
   classifyByMood(song) {
       var mood;
+      var playlist;
       spotifyWebAPI.getAudioFeaturesForTrack(song.id)
         .then((response) => {
           console.log(song.name, " Tempo ", response.tempo, " Energy ", response.energy, " Dancability ", response.danceability, " Valence ", response.valence);
@@ -148,21 +168,22 @@ class App extends Component {
           else mood = "bag";
 
           //console.log(song.name, " is ", mood);
-          return mood;
+          for(playlist of this.state.playlists) {
+            if(mood === playlist.name) {
+              return playlist.id;
+            }
+          }
+          return '';
         });
-  }
-
-
-  sortSongs(songs) {
-    //classify each song and then add it to the corresponding mood playlist
-      var song;
-      for(song of songs) {
-
-      }
   }
 
   createMoodPlaylists() {
     //check mood form and create playlists in user's account accordingly
+    var mood;
+    for(mood of this.state.moods) {
+      this.makeNewPlaylist(mood[0]);
+    }
+    this.getPlaylists();
   }
 
   handleMoodChange(e) {
@@ -170,17 +191,25 @@ class App extends Component {
       const item = e.target.name;
       const isChecked = e.target.checked;
       this.setState(prevState => ({ moods: prevState.moods.set(item, isChecked) }));
-      //var items;
       console.log(this.state.moods);
   }
 
   handlePlaylistChange(e) {
-    this.setState( { chosenPlaylist: e.target.value } );
+    this.setState( { chosenPlaylist: {name: e.target.name, id: e.target.value }} );
     console.log(this.state.chosenPlaylist);
   }
 
   goButtonClicked() {
-    this.createMoodPlaylists(); 
+    this.createMoodPlaylists();
+    if(this.state.chosenPlaylist.value === 'liked') {
+      this.getSavedSongs(50, 0);
+    } else {
+      this.getPlaylistSongs(this.state.chosenPlaylist.id);
+    }
+    var song;
+    for(song of this.state.selectedPlaylistSongs) {
+      this.addSong(song.id, this.classifyByMood(song));
+    } 
   }
 
   render() {
@@ -208,15 +237,3 @@ class App extends Component {
 }
 
 export default App;
-
-        // {/* TESTER CODE */}
-        // {/* <ul>
-        //   {this.state.savedSongs.map(item => (
-        //     <li>{item.name}</li>
-        //   ))}
-        // </ul> */}
-        //   {/* <button onClick = {() => this.classifyByMood(this.state.savedSongs[Math.floor(Math.random() * 100)])}>Classify Song</button>
-        //   <button onClick = {() => this.getPlaylists()}>Check Playlists</button>
-        //   <button onClick = {() => this.getSavedSongs(50, 0)}>Check Songs on Playlist</button>
-        //   <button onClick = {() => this.makeNewPlaylist()}>Make Playlist</button>
-        //   <button onClick = {() => this.addSongs()}>Add Song</button> */}
