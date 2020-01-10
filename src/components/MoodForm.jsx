@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import Checkbox from './Checkbox';
 import styled from 'styled-components';
 
@@ -57,9 +56,7 @@ class MoodForm extends React.Component {
   }
 
   handleChange(e) {
-    const item = e.target.name;
-    const isChecked = e.target.checked;
-    this.setState(prevState => ({ checkedItems: prevState.checkedItems.set(item, isChecked) }));
+    this.props.handleMoodChange(e);
   }
 
   render() {
@@ -69,7 +66,7 @@ class MoodForm extends React.Component {
           checkboxes.map(item => (
             <Label>
               <Text>{item.name}</Text>
-              <Checkbox name={item.name} checked={this.state.checkedItems.get(item.name)} onChange={this.handleChange} />
+              <Checkbox name={item.name} checked={this.props.checkedItems.get(item.name)} onChange={this.handleChange} />
             </Label>
           ))
         }

@@ -22,7 +22,7 @@ const Wrapper = styled.button`
 class GoButton extends Component {
     render() {
         return(
-            <Wrapper>
+            <Wrapper onClick = {this.props.onClick}>
                 Sort Your Playlists!
             </Wrapper>
         );

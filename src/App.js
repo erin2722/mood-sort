@@ -1,21 +1,29 @@
 import React, { Component } from 'react';
-import './App.css';
 import styled from 'styled-components';
 import SpotifyWebAPI from 'spotify-web-api-js';
 import Header from './components/Header.jsx';
-import FormWrapper from './components/FormWrapper.jsx';
+import PlaylistForm from './components/PlaylistForm.jsx';
+import MoodForm from './components/MoodForm.jsx';
 import GoButton from './components/GoButton.jsx';
 import LogInButton from './components/LogInButton.jsx';
-
 
 const spotifyWebAPI = new SpotifyWebAPI();
 
 const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
-  justify-contnent: space-around;
+  justify-content: space-around;
   align-items: center;
   margin: 50px;
+`;
+
+const FormWrapper = styled.div`
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: row;
+    margin: 50px;
+    margin-top: 50px;
 `;
 
 
@@ -36,8 +44,13 @@ class App extends Component {
       savedSongs: [
         {name: '', uri: '', id: '', mood: ''}
       ],
-      recentPlaylistID: ''
+      recentPlaylistID: '',
+      moods: new Map(), 
+      chosenPlaylist: ''
     }
+
+    this.handleMoodChange = this.handleMoodChange.bind(this);
+    this.handlePlaylistChange = this.handlePlaylistChange.bind(this);
   }
 
   getHashParams() {
@@ -111,7 +124,7 @@ class App extends Component {
   }
 
   addSongs() {
-    var song;
+    //var song;
     var songs = ['spotify:track:5u431x19PX588bk9XGlwN8'];
     // for(song of this.state.savedSongs) {
     //   songs.concat(song.uri);
@@ -139,13 +152,48 @@ class App extends Component {
         });
   }
 
+
+  sortSongs(songs) {
+    //classify each song and then add it to the corresponding mood playlist
+      var song;
+      for(song of songs) {
+
+      }
+  }
+
+  createMoodPlaylists() {
+    //check mood form and create playlists in user's account accordingly
+  }
+
+  handleMoodChange(e) {
+      console.log(e.target.value);
+      const item = e.target.name;
+      const isChecked = e.target.checked;
+      this.setState(prevState => ({ moods: prevState.moods.set(item, isChecked) }));
+      //var items;
+      console.log(this.state.moods);
+  }
+
+  handlePlaylistChange(e) {
+    this.setState( { chosenPlaylist: e.target.value } );
+    console.log(this.state.chosenPlaylist);
+  }
+
+  goButtonClicked() {
+    this.createMoodPlaylists(); 
+  }
+
   render() {
+    //should be this.state.loggedIn
     if(true) {
       return (
         <Wrapper className="App">
           <Header loggedIn = {true} />
-          <FormWrapper />
-          <GoButton onClick = {() => this.addSongs()} />
+          <FormWrapper>
+            <PlaylistForm titles = {['mountain songs', 'j vibing']} handlePlaylistChange = {this.handlePlaylistChange} value = {this.state.chosenPlaylist} />
+            <MoodForm moods = {['happy, sad, angry']} handleMoodChange = {this.handleMoodChange} checkedItems = {this.state.moods} /> 
+          </FormWrapper>
+          <GoButton onClick = {() => this.goButtonClicked()} />
         </Wrapper>
       );
     } else {
@@ -161,14 +209,14 @@ class App extends Component {
 
 export default App;
 
-        {/* TESTER CODE */}
-        {/* <ul>
-          {this.state.savedSongs.map(item => (
-            <li>{item.name}</li>
-          ))}
-        </ul> */}
-          {/* <button onClick = {() => this.classifyByMood(this.state.savedSongs[Math.floor(Math.random() * 100)])}>Classify Song</button>
-          <button onClick = {() => this.getPlaylists()}>Check Playlists</button>
-          <button onClick = {() => this.getSavedSongs(50, 0)}>Check Songs on Playlist</button>
-          <button onClick = {() => this.makeNewPlaylist()}>Make Playlist</button>
-          <button onClick = {() => this.addSongs()}>Add Song</button> */}
+        // {/* TESTER CODE */}
+        // {/* <ul>
+        //   {this.state.savedSongs.map(item => (
+        //     <li>{item.name}</li>
+        //   ))}
+        // </ul> */}
+        //   {/* <button onClick = {() => this.classifyByMood(this.state.savedSongs[Math.floor(Math.random() * 100)])}>Classify Song</button>
+        //   <button onClick = {() => this.getPlaylists()}>Check Playlists</button>
+        //   <button onClick = {() => this.getSavedSongs(50, 0)}>Check Songs on Playlist</button>
+        //   <button onClick = {() => this.makeNewPlaylist()}>Make Playlist</button>
+        //   <button onClick = {() => this.addSongs()}>Add Song</button> */}

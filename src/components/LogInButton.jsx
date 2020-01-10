@@ -23,7 +23,8 @@ class LogInButton extends Component {
     render() {
         return(
             <Wrapper>
-                <img alt = "spotify logo" src = {BlackAndWhiteLogo} style = {{ width: 30 }} /> <LogIn href = 'http://localhost:8888'>Log in to Spotify</LogIn>
+                <img alt = "spotify logo" src = {BlackAndWhiteLogo} style = {{ width: 30 }} />
+                <LogIn href = 'http://localhost:8888'>Log in to Spotify</LogIn>
             </Wrapper>
         );
     }

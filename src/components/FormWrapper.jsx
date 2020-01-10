@@ -13,14 +13,11 @@ const Wrapper = styled.div`
 `;
 
 class FormWrapper extends Component {
-    constructor(props) {
-        super(props);
-    }
     render() {
         return(
             <Wrapper>
-                <PlaylistForm titles = {['mountain songs', 'j vibing']} />
-                <MoodForm moods = {['happy, sad, angry']} />
+                <PlaylistForm titles = {this.props.titles}/>
+                <MoodForm moods = {this.props.moods} />
             </Wrapper>
         );
     }

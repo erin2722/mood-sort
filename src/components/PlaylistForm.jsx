@@ -28,9 +28,7 @@ const Option = styled.option`
   font-size:  14px;
   `;
 
-const Label = styled.div``;
-
-class MoodForm extends Component {
+class PlaylistForm extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -41,15 +39,13 @@ class MoodForm extends Component {
     }
 
     handleChange(event) {
-        this.setState({value: event.target.value});
-        console.log(this.state.value);
+        this.props.handlePlaylistChange(event);
     }
 
     render() {
         return (
           <Wrapper>
-                {/* <Label>Choose a Playlist</Label> */}
-                <Form value={this.state.value} onChange={this.handleChange}>
+                <Form value={this.props.value} onChange={this.handleChange}>
                   <Option value = ''>Choose a Playlist</Option>
                   <Option value="liked">Liked Songs</Option>
                   {this.props.titles.map(item => (
@@ -61,4 +57,4 @@ class MoodForm extends Component {
     }
 }
 
-export default MoodForm;
+export default PlaylistForm;
