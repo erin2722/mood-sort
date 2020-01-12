@@ -6,6 +6,7 @@ import PlaylistForm from './components/PlaylistForm.jsx';
 import MoodForm from './components/MoodForm.jsx';
 import GoButton from './components/GoButton.jsx';
 import LogInButton from './components/LogInButton.jsx';
+// import SortForm from './components/sortForm.jsx';
 
 const spotifyWebAPI = new SpotifyWebAPI();
 
@@ -26,6 +27,28 @@ const FormWrapper = styled.div`
     margin-top: 50px;
 `;
 
+var moods = [
+  {
+    name: 'good vibes',
+    key: 1,
+    label: 'good vibes',
+  },      
+  {
+    name: 'chill',
+    key: 2,
+    label: 'chill',
+  },   
+  {
+    name: 'bag',
+    key: 3,
+    label: 'bag',
+  },   
+  {
+    name: 'hype',
+    key: 4,
+    label: 'hype',
+  },   
+]
 
 class App extends Component {
   constructor() {
@@ -39,14 +62,18 @@ class App extends Component {
       loggedIn: params.access_token ? true : false,
       userID: this.getUsername(),
       playlists: [ 
-        {name: '', id: ''}
+        {name: 'hey', id: '24436157hwe5332'},
+        {name: 'hi', id: '24436157hwe5332'},
       ],
       selectedPlaylistSongs: [
-        {name: '', uri: '', id: '', mood: ''}
+        {name: 'cocoa butter kisses', uri: '4t98h429b4 ', id: 'g4nn4249ugb', mood: 'good vibes'},
+        {name: 'juke jam', uri: '4t98h429b4 ', id: 'g4nn4249ugb', mood: 'chill'},
+        {name: 'hot shower', uri: '4t98h429b4 ', id: 'g4nn4249ugb', mood: 'hype'},
+        {name: 'same drugs', uri: '4t98h429b4 ', id: 'g4nn4249ugb', mood: 'bag'}
       ],
-      recentPlaylistID: '',
+      recentPlaylistID: '431y35hy3h5r',
       moods: new Map(), 
-      chosenPlaylist: {name: '', id: ''}
+      chosenPlaylist: {name: 'qowengwoeng', id: 'qgonrwn'}
     }
 
     this.handleMoodChange = this.handleMoodChange.bind(this);
@@ -145,11 +172,9 @@ class App extends Component {
   }
 
   addSong(song, mood) {
-    //will replace with song.uri
-    var songs = ['spotify:track:5u431x19PX588bk9XGlwN8'];
+    var songs = ['spotify:track:5u431x19PX588bk9XGlwN8', song.uri];
 
-    //will replace random id with mood playlist id
-    spotifyWebAPI.addTracksToPlaylist('', '4u3BK21IWkEpcd8ydK7liu', songs)
+    spotifyWebAPI.addTracksToPlaylist('', mood, songs)
       .then((response) => {
         console.log(response);
       }
@@ -163,7 +188,7 @@ class App extends Component {
         .then((response) => {
           console.log(song.name, " Tempo ", response.tempo, " Energy ", response.energy, " Dancability ", response.danceability, " Valence ", response.valence);
           if(response.danceability > .750 && response.tempo < .750) mood = "good vibes";
-          else if(response.danceability > .750) mood = "bad bitch";
+          else if(response.danceability > .750) mood = "hype";
           else if(response.tempo < 110 && response.energy < .400) mood = "chill";
           else mood = "bag";
 
@@ -173,7 +198,7 @@ class App extends Component {
               return playlist.id;
             }
           }
-          return '';
+          return '4u3BK21IWkEpcd8ydK7liu';
         });
   }
 
@@ -181,22 +206,20 @@ class App extends Component {
     //check mood form and create playlists in user's account accordingly
     var mood;
     for(mood of this.state.moods) {
-      this.makeNewPlaylist(mood[0]);
+      console.log(mood[0] + " songs from " + this.state.chosenPlaylist.name + " is created");
+      this.makeNewPlaylist(mood[0] + " songs from " + this.state.chosenPlaylist.name);
     }
     this.getPlaylists();
   }
 
   handleMoodChange(e) {
-      console.log(e.target.value);
       const item = e.target.name;
       const isChecked = e.target.checked;
       this.setState(prevState => ({ moods: prevState.moods.set(item, isChecked) }));
-      console.log(this.state.moods);
   }
 
   handlePlaylistChange(e) {
-    this.setState( { chosenPlaylist: {name: e.target.name, id: e.target.value }} );
-    console.log(this.state.chosenPlaylist);
+    this.setState( { chosenPlaylist: {name: 'not working', id: e.target.value }} );
   }
 
   goButtonClicked() {
@@ -210,6 +233,7 @@ class App extends Component {
     for(song of this.state.selectedPlaylistSongs) {
       this.addSong(song.id, this.classifyByMood(song));
     } 
+    alert('check your spotify account!');
   }
 
   render() {
@@ -219,8 +243,15 @@ class App extends Component {
         <Wrapper className="App">
           <Header loggedIn = {true} />
           <FormWrapper>
-            <PlaylistForm titles = {['mountain songs', 'j vibing']} handlePlaylistChange = {this.handlePlaylistChange} value = {this.state.chosenPlaylist} />
-            <MoodForm moods = {['happy, sad, angry']} handleMoodChange = {this.handleMoodChange} checkedItems = {this.state.moods} /> 
+            <PlaylistForm 
+              titles = {this.state.playlists} 
+              handlePlaylistChange = {this.handlePlaylistChange} 
+              value = {this.state.chosenPlaylist.id} />
+            {/* <SortForm /> */}
+            <MoodForm 
+              moods = {moods} 
+              handleMoodChange = {this.handleMoodChange} 
+              checkedItems = {this.state.moods} /> 
           </FormWrapper>
           <GoButton onClick = {() => this.goButtonClicked()} />
         </Wrapper>

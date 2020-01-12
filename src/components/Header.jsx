@@ -24,14 +24,14 @@ class Header extends Component {
         if(this.props.loggedIn) {
             return(
                 <Wrapper>
-                    <Title>Mood Sort</Title>
-                    <Description>sort large, unkept playlists into smaller playlists by mood.</Description>
+                    <Title>mood-sort</Title>
+                    <Description>sort large, unkept playlists into smaller playlists by mood</Description>
                 </Wrapper>
             );
         } else {
             return(
                 <Wrapper>
-                    <Title>Mood Sort</Title>
+                    <Title>mood-sort</Title>
                     <Description>sort large, unkept playlists into smaller playlists by mood</Description>
                     <br></br><br></br>
                     <Description>log into spotify to get started</Description>

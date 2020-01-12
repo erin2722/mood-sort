@@ -1,48 +1,18 @@
 import React from 'react';
 import Checkbox from './Checkbox';
 import styled from 'styled-components';
+  
+const Wrapper = styled.div``;
 
-var checkboxes = [
-    {
-      name: 'Happy',
-      key: 'happy',
-      label: 'Sad',
-    },
-    {
-      name: 'Sad',
-      key: 'sad',
-      label: 'Sad',
-    },
-    {
-        name: 'Bag',
-        key: 'ad',
-        label: 'Sad',
-      },
-      {
-        name: 'Chill',
-        key: 'sd',
-        label: 'Sad',
-      },
-      {
-        name: 'Good Vibes',
-        key: 'sa',
-        label: 'Sad',
-      },
-  ];
+const Label = styled.div`
+  display: flex;
+  align-items: center;
+  padding: 10px;
+`;
 
-  const Wrapper = styled.div`
-    
-  `;
-
-  const Label = styled.span`
-    display: flex;
-    align-items: center;
-    padding: 10px;
-  `;
-
-  const Text = styled.span`
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
-  `;
+const Text = styled.span`
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+`;
 
 class MoodForm extends React.Component {
   constructor(props) {
@@ -63,10 +33,10 @@ class MoodForm extends React.Component {
     return (
       <Wrapper>
         {
-          checkboxes.map(item => (
+          this.props.moods.map(item => (
             <Label>
-              <Text>{item.name}</Text>
               <Checkbox name={item.name} checked={this.props.checkedItems.get(item.name)} onChange={this.handleChange} />
+              <Text>{item.name}</Text>
             </Label>
           ))
         }
