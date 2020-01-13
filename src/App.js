@@ -6,7 +6,6 @@ import PlaylistForm from './components/PlaylistForm.jsx';
 import MoodForm from './components/MoodForm.jsx';
 import GoButton from './components/GoButton.jsx';
 import LogInButton from './components/LogInButton.jsx';
-// import SortForm from './components/sortForm.jsx';
 
 const spotifyWebAPI = new SpotifyWebAPI();
 
@@ -61,18 +60,11 @@ class App extends Component {
     this.state = {
       loggedIn: params.access_token ? true : false,
       userID: this.getUsername(),
-      playlists: [ 
-        {name: 'hey', id: '24436157hwe5332'},
-        {name: 'hi', id: '24436157hwe5332'},
-      ],
-      selectedPlaylistSongs: [
-        // {name: 'cocoa butter kisses', uri: '4t98h429b4 ', id: 'g4nn4249ugb', mood: 'good vibes'},
-        // {name: 'juke jam', uri: '4t98h429b4 ', id: 'g4nn4249ugb', mood: 'chill'},
-        // {name: 'hot shower', uri: '4t98h429b4 ', id: 'g4nn4249ugb', mood: 'hype'},
-        // {name: 'same drugs', uri: '4t98h429b4 ', id: 'g4nn4249ugb', mood: 'bag'}
-      ],
+      playlists: [],
+      selectedPlaylistSongs: [],
       moods: new Map(), 
-      chosenPlaylist: {name: 'qowengwoeng', id: 'qgonrwn'}
+      chosenPlaylist: {},
+      numCreated: 0
     }
 
     this.handleMoodChange = this.handleMoodChange.bind(this);
@@ -95,7 +87,6 @@ class App extends Component {
   getUsername() {
     spotifyWebAPI.getMe()
       .then((response) => {
-        //console.log(response.id);
         this.setState({
           userID: response.id
         })
@@ -122,16 +113,17 @@ class App extends Component {
   }
 
   getSavedSongs(limit, offset) {
-    spotifyWebAPI.getMySavedTracks({limit: limit, offset: offset})
-      .then((response) => {
+    spotifyWebAPI.getPlaylistTracks(limit, offset)
+      .then((response) =>{
         var song;
+        //console.log('there');
         for(song of response.items) {
           this.setState(state => {
             const selectedPlaylistSongs = state.selectedPlaylistSongs.concat({ 
               name: song.track.name, 
               uri: song.track.uri,
               id: song.track.id,
-              mood: 'happy' //this.classifyByMood(song.track)
+              //mood: 'happy'
             });
 
             return {
@@ -139,7 +131,6 @@ class App extends Component {
             }
           })
         }
-        //console.log(this.state.selectedPlaylistSongs);
 
         if(this.state.selectedPlaylistSongs.length < response.total) {
           if(offset + 50 <= this.state.selectedPlaylistSongs.length)
@@ -148,21 +139,64 @@ class App extends Component {
             this.getSavedSongs(this.state.selectedPlaylistSongs.length - (offset + 50), offset + 50);
         }
 
-        
-        var songURIs = [];
-        var song;
+        var hypeURIs = [];
+        var goodVibesURIs = [];
+        var chillURIs = [];
+        var bagURIs = [];
+
+        var songIDs = []
 
         for(song of this.state.selectedPlaylistSongs) {
-          //console.log(song.uri);
-          songURIs.push(song.uri);
-        } 
+          songIDs.push(song.id);
+        }
 
-        console.log(songURIs);
+          //var mood;
+          spotifyWebAPI.getAudioFeaturesForTracks(songIDs)
+            .then((response) => {
+              var song;
+              var mood;
 
-        this.addSong(songURIs, '4u3BK21IWkEpcd8ydK7liu');
+              for(song of response.audio_features) {
+              //console.log(song.name, " Tempo ", response.tempo, " Energy ", response.energy, " Dancability ", response.danceability, " Valence ", response.valence);
+              if(song.danceability > .750 && song.tempo < .750) mood = "good vibes";
+              else if(song.danceability > .750) mood = "hype";
+              else if(song.tempo < 110 && song.energy < .400) mood = "chill";
+              else mood = "bag";
 
-        //console.log(this.state.selectedPlaylistSongs);
-        console.log('check your spotify account!');
+              if(mood === 'chill') {
+                chillURIs.push(song.uri);
+              } else if(mood === 'good vibes') {
+                goodVibesURIs.push(song.uri);
+              } else if(mood === 'bag') {
+                bagURIs.push(song.uri);
+              } else if(mood === 'hype') {
+                hypeURIs.push(song.uri);
+              }
+              }
+
+              var moodNames = [];
+
+              for(mood of this.state.moods) {
+                if(mood[1]) {
+                  moodNames.push(mood[0]);
+                }
+              }
+
+                moodNames.map(mood => {
+                spotifyWebAPI.createPlaylist(this.state.userID, {name: mood, description: "Created by mood-sort from " + this.state.chosenPlaylist.id + " playlist"})
+                  .then((response) =>{
+                    if(mood === 'bag' && bagURIs.length !== 0) {
+                      spotifyWebAPI.addTracksToPlaylist('', response.id, bagURIs);
+                    } else if(mood === 'hype' && hypeURIs.length !== 0) {
+                      spotifyWebAPI.addTracksToPlaylist('', response.id, hypeURIs);
+                    } else if(mood === 'good vibes' && goodVibesURIs.length !== 0) {
+                      spotifyWebAPI.addTracksToPlaylist('', response.id, goodVibesURIs);
+                    } else if(mood === 'chill' && chillURIs.length !== 0) {
+                      spotifyWebAPI.addTracksToPlaylist('', response.id, goodVibesURIs);
+                    }
+                  });
+            })
+          });
       })
   }
 
@@ -170,13 +204,14 @@ class App extends Component {
     spotifyWebAPI.getPlaylistTracks('', playlistID)
       .then((response) =>{
         var song;
+        //console.log('there');
         for(song of response.items) {
           this.setState(state => {
             const selectedPlaylistSongs = state.selectedPlaylistSongs.concat({ 
               name: song.track.name, 
               uri: song.track.uri,
               id: song.track.id,
-              mood: 'happy' //this.classifyByMood(song.track)
+              //mood: 'happy'
             });
 
             return {
@@ -190,155 +225,125 @@ class App extends Component {
         var chillURIs = [];
         var bagURIs = [];
 
-        var mood;
-        var song;
+        var songIDs = []
 
         for(song of this.state.selectedPlaylistSongs) {
-          //songURIs.push(song.uri);
-          mood = this.classifyByMood(song);
-
-          console.log(mood);
-
-          if(mood === 'chill') {
-            chillURIs.push(song.uri);
-          } else if(mood === 'good vibes') {
-            goodVibesURIs.push(song.uri);
-          } else if(mood === 'bag') {
-            bagURIs.push(song.uri);
-          } else if(mood === 'hype') {
-            hypeURIs.push(song.uri);
-          }
-        } 
-
-        console.log(chillURIs);
-        console.log(bagURIs);
-        console.log(hypeURIs);
-        console.log(goodVibesURIs);
-
-        var playlist;
-
-        for(playlist of this.state.playlists) {
-          //console.log(playlist);
-          if(playlist.name === 'chill' + " songs from " + this.state.chosenPlaylist.name && chillURIs.length !== 0) {
-            //console.log("!!!!!!!!!!!!!");
-            this.addSong(chillURIs, playlist.id);
-            break;
-          }
+          songIDs.push(song.id);
         }
 
-        for(playlist of this.state.playlists) {
-          //console.log(playlist);
-          if(playlist.name === 'bag' + " songs from " + this.state.chosenPlaylist.name && bagURIs.length !== 0) {
-            //console.log("!!!!!!!!!!!!!");
-            this.addSong(bagURIs, playlist.id);
-            break;
-          }
-        }
+          //var mood;
+          spotifyWebAPI.getAudioFeaturesForTracks(songIDs)
+            .then((response) => {
+              //console.log(response);
+              var song;
+              var mood;
+              for(song of response.audio_features) {
+              //console.log(song.name, " Tempo ", response.tempo, " Energy ", response.energy, " Dancability ", response.danceability, " Valence ", response.valence);
+              if(song.danceability > .750 && song.tempo < .750) mood = "good vibes";
+              else if(song.danceability > .750) mood = "hype";
+              else if(song.tempo < 110 && song.energy < .400) mood = "chill";
+              else mood = "bag";
+    
+              //console.log(mood);
 
-        for(playlist of this.state.playlists) {
-          //console.log(playlist);
-          if(playlist.name === 'good vibes' + " songs from " + this.state.chosenPlaylist.name && goodVibesURIs.length !== 0) {
-            //console.log("!!!!!!!!!!!!!");
-            this.addSong(goodVibesURIs, playlist.id);
-            break;
-          }
-        }
 
-        for(playlist of this.state.playlists) {
-          //console.log(playlist);
-          if(playlist.name === 'hype' + " songs from " + this.state.chosenPlaylist.name && hypeURIs.length !== 0) {
-            //console.log("!!!!!!!!!!!!!");
-            this.addSong(hypeURIs, playlist.id);
-            break;
-          }
-        }
+              if(mood === 'chill') {
+                chillURIs.push(song.uri);
+              } else if(mood === 'good vibes') {
+                goodVibesURIs.push(song.uri);
+              } else if(mood === 'bag') {
+                bagURIs.push(song.uri);
+              } else if(mood === 'hype') {
+                hypeURIs.push(song.uri);
+              }
+              }
 
-        //console.log(songURIs);
+              var moodNames = [];
 
-        //this.addSong(songURIs, '4u3BK21IWkEpcd8ydK7liu');
+              for(mood of this.state.moods) {
+                if(mood[1]) {
+                  moodNames.push(mood[0]);
+                }
+              }
 
-        //console.log(this.state.selectedPlaylistSongs);
-        console.log('check your spotify account!');
-
+                moodNames.map(mood => {
+                spotifyWebAPI.createPlaylist(this.state.userID, {name: mood, description: "Created by mood-sort from " + this.state.chosenPlaylist.id + " playlist"})
+                  .then((response) =>{
+                    if(mood === 'bag' && bagURIs.length !== 0) {
+                      spotifyWebAPI.addTracksToPlaylist('', response.id, bagURIs);
+                    } else if(mood === 'hype' && hypeURIs.length !== 0) {
+                      spotifyWebAPI.addTracksToPlaylist('', response.id, hypeURIs);
+                    } else if(mood === 'good vibes' && goodVibesURIs.length !== 0) {
+                      spotifyWebAPI.addTracksToPlaylist('', response.id, goodVibesURIs);
+                    } else if(mood === 'chill' && chillURIs.length !== 0) {
+                      spotifyWebAPI.addTracksToPlaylist('', response.id, goodVibesURIs);
+                    }
+                  });
+            })
+          });
       })
   }
 
-  makeNewPlaylist(name) {
-    spotifyWebAPI.createPlaylist(this.state.userID, {name: name, description: "Created by mood-sort from " + this.state.chosenPlaylist + " playlist"})
-      .then((response) =>{
-        this.setState({
-          recentPlaylistID: response.id
-        })
-      });
-  }
+  // makeNewPlaylist(name) {
+  //   spotifyWebAPI.createPlaylist(this.state.userID, {name: name, description: "Created by mood-sort from " + this.state.chosenPlaylist.id + " playlist"})
+  //     .then((response) =>{
+  //       this.setState({
+  //         recentPlaylistID: response.id
+  //       })
+  //     });
+  // }
 
-  addSong(songs, mood) {
-    //console.log(song +  " " + mood)
-    //var songs = [song];
+  // addSong(songs, mood) {
+  //   spotifyWebAPI.addTracksToPlaylist('', mood, songs);
+  // }
 
-    spotifyWebAPI.addTracksToPlaylist('', mood, songs)
-      .then((response) => {
-        //console.log(response);
-      }
-      )
-  }
+  // classifyByMood(song) {
+  //     var mood;
+  //     var playlist;
+  //     spotifyWebAPI.getAudioFeaturesForTrack(song.id)
+  //       .then((response) => {
+  //         //console.log(song.name, " Tempo ", response.tempo, " Energy ", response.energy, " Dancability ", response.danceability, " Valence ", response.valence);
+  //         if(response.danceability > .750 && response.tempo < .750) mood = "good vibes";
+  //         else if(response.danceability > .750) mood = "hype";
+  //         else if(response.tempo < 110 && response.energy < .400) mood = "chill";
+  //         else mood = "bag";
 
-  classifyByMood(song) {
-      var mood;
-      var playlist;
-      spotifyWebAPI.getAudioFeaturesForTrack(song.id)
-        .then((response) => {
-          //console.log(song.name, " Tempo ", response.tempo, " Energy ", response.energy, " Dancability ", response.danceability, " Valence ", response.valence);
-          if(response.danceability > .750 && response.tempo < .750) mood = "good vibes";
-          else if(response.danceability > .750) mood = "hype";
-          else if(response.tempo < 110 && response.energy < .400) mood = "chill";
-          else mood = "bag";
-
-          console.log(mood);
+  //         console.log(mood);
           
-          return mood;
+  //         return mood;
+  //       });
+  // }
 
-          // //console.log(song.name, " is ", mood);
-          // for(playlist of this.state.playlists) {
-          //   //console.log(playlist);
-          //   if(playlist.name === mood + " songs from " + this.state.chosenPlaylist.name) {
-          //     //console.log("!!!!!!!!!!!!!");
-          //     return '4u3BK21IWkEpcd8ydK7liu';
-          //   }
-          // }
-          // return '4u3BK21IWkEpcd8ydK7liu';
-        });
-  }
+  // createMoodPlaylists() {
+  //   //check mood form and create playlists in user's account accordingly
+  //   var mood;
+  //   for(mood of this.state.moods) {
+  //     if(this.makeNewPlaylist(mood[0] + " songs from " + this.state.chosenPlaylist.name)) {
+  //       this.setState(prevState => ({ moods: prevState.moods.set(mood[0], mood[1], true) }))
+  //     }
+  //   }
 
-  createMoodPlaylists() {
-    //check mood form and create playlists in user's account accordingly
-    var mood;
-    for(mood of this.state.moods) {
-      //console.log(mood[0] + " songs from " + this.state.chosenPlaylist.name + " is created");
-      this.makeNewPlaylist(mood[0] + " songs from " + this.state.chosenPlaylist.name);
-    }
-    this.getPlaylists();
-  }
+  //   this.getPlaylists();
+
+  // }
 
   handleMoodChange(e) {
       const item = e.target.name;
       const isChecked = e.target.checked;
+      //const  isMade = false;
       this.setState(prevState => ({ moods: prevState.moods.set(item, isChecked) }));
   }
 
   handlePlaylistChange(e) {
-    this.setState( { chosenPlaylist: {name: 'not working', id: e.target.value }} );
+    this.setState( { chosenPlaylist: {name: 'a', id: e.target.value }} );
   }
 
   goButtonClicked() {
-    this.createMoodPlaylists();
-
-    if(this.state.chosenPlaylist.id === 'liked') {
-      this.getSavedSongs(50, 0);
-    } else {
-      this.getPlaylistSongs(this.state.chosenPlaylist.id);
-    }
-
+      if(this.state.chosenPlaylist.id === 'liked') {
+        this.getSavedSongs(50, 0);
+      } else {
+        this.getPlaylistSongs(this.state.chosenPlaylist.id);
+      }
   }
 
   render() {
