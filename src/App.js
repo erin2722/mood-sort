@@ -309,14 +309,12 @@ class App extends Component {
               titles = {this.state.playlists} 
               handlePlaylistChange = {this.handlePlaylistChange} 
               value = {this.state.chosenPlaylist.id} />
-            {/* <SortForm /> */}
             <MoodForm 
               moods = {moods} 
               handleMoodChange = {this.handleMoodChange} 
               checkedItems = {this.state.moods} /> 
           </FormWrapper>
           <GoButton onClick = {() => this.goButtonClicked()} />
-          {/* <button onClick = {() => this.addSong('spotify:track:5u431x19PX588bk9XGlwN8', '4u3BK21IWkEpcd8ydK7liu')}>click me</button> */}
         </Wrapper>
       );
     } else {
