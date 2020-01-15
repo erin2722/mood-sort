@@ -193,11 +193,6 @@ class App extends Component {
   }
 
   sortSongs() { 
-    var hypeURIs = [];
-    var goodVibesURIs = [];
-    var chillURIs = [];
-    var bagURIs = [];
-
     var songIDs = [[]];
     var song;
     var hundred = 0;
@@ -210,8 +205,6 @@ class App extends Component {
       songIDs[hundred].push(song.id);
     }
 
-    console.log(this.state.selectedPlaylistSongs);
-
       Promise.all(songIDs.map(songID =>
         spotifyWebAPI.getAudioFeaturesForTracks(songID)))
         .then((response) => {
@@ -220,23 +213,40 @@ class App extends Component {
           var arr;
           var mood;
 
-          for(arr of response) {
-          for(song of arr.audio_features) {
-          //console.log(song.name, " Tempo ", response.tempo, " Energy ", response.energy, " Dancability ", response.danceability, " Valence ", response.valence);
-          if(song.energy > .85 || song.danceability > .85) mood = "hype";
-          else if(song.valence < .50 && song.energy < .80 ) mood = "bag"
-          else if(song.energy > .55 && song.danceability > .50) mood = "good vibes";
-          else mood = "chill";
+          var chillURIs = [[]];
+          var hypeURIs = [[]];
+          var goodVibesURIs = [[]];
+          var bagURIs = [[]];
 
-          if(mood === 'chill') {
-            chillURIs.push(song.uri);
-          } else if(mood === 'good vibes') {
-            goodVibesURIs.push(song.uri);
-          } else if(mood === 'bag') {
-            bagURIs.push(song.uri);
-          } else if(mood === 'hype') {
-            hypeURIs.push(song.uri);
-          }
+          for(arr of response) {
+            for(song of arr.audio_features) {
+            //console.log(song.name, " Tempo ", response.tempo, " Energy ", response.energy, " Dancability ", response.danceability, " Valence ", response.valence);
+            if(song.energy > .80 || song.danceability > .80) mood = "hype";
+            else if((song.energy > .65 && song.danceability > .50) && song.valence > .40) mood = "good vibes";
+            else if(song.valence < .50 && song.energy < .50 ) mood = "bag"
+            else mood = "chill";
+
+            if(mood === 'chill') {
+              if(chillURIs[chillURIs.length - 1].length === 100) {
+                chillURIs.push([]);
+              }
+              chillURIs[chillURIs.length - 1].push(song.uri);
+            } else if(mood === 'good vibes') {
+              if(goodVibesURIs[goodVibesURIs.length - 1].length === 100) {
+                goodVibesURIs.push([]);
+              }
+              goodVibesURIs[goodVibesURIs.length - 1].push(song.uri);
+            } else if(mood === 'bag') {
+                if(bagURIs[bagURIs.length - 1].length === 100) {
+                  bagURIs.push([]);
+                }
+                bagURIs[bagURIs.length - 1].push(song.uri);
+            } else if(mood === 'hype') {
+              if(hypeURIs[hypeURIs.length - 1].length === 100) {
+                hypeURIs.push([]);
+              }
+              hypeURIs[hypeURIs.length - 1].push(song.uri);
+            }
           }
         }
 
@@ -251,17 +261,20 @@ class App extends Component {
           moodNames.map(mood => {
           spotifyWebAPI.createPlaylist(this.state.userID, {name: mood + " songs of " + this.state.chosenPlaylist.name, description: "Created by mood-sort from " + this.state.chosenPlaylist.name + " playlist"})
             .then((response) =>{
-              if(mood === 'bag' && bagURIs.length !== 0) {
-                spotifyWebAPI.addTracksToPlaylist('', response.id, bagURIs);
-              } else if(mood === 'hype' && hypeURIs.length !== 0) {
-                spotifyWebAPI.addTracksToPlaylist('', response.id, hypeURIs);
-              } else if(mood === 'good vibes' && goodVibesURIs.length !== 0) {
-                spotifyWebAPI.addTracksToPlaylist('', response.id, goodVibesURIs);
-              } else if(mood === 'chill' && chillURIs.length !== 0) {
-                spotifyWebAPI.addTracksToPlaylist('', response.id, chillURIs);
+              if(mood === 'bag' && bagURIs[0].length !== 0) {
+                bagURIs.map(bagURI => {
+                spotifyWebAPI.addTracksToPlaylist('', response.id, bagURI)});
+              } else if(mood === 'hype' && hypeURIs[0].length !== 0) {
+                hypeURIs.map(hypeURI => {
+                spotifyWebAPI.addTracksToPlaylist('', response.id, hypeURI)});
+              } else if(mood === 'good vibes' && goodVibesURIs[0].length !== 0) {
+                goodVibesURIs.map(goodVibesURI => {
+                spotifyWebAPI.addTracksToPlaylist('', response.id, goodVibesURI)});
+              } else if(mood === 'chill' && chillURIs[0].length !== 0) {
+                chillURIs.map(chillURI => {
+                spotifyWebAPI.addTracksToPlaylist('', response.id, chillURI)});
               }
-              console.log("all done!");
-            });
+            })
         })
       })
   }
