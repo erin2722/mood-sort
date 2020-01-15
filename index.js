@@ -15,7 +15,7 @@ var cors = require('cors');
 var querystring = require('querystring');
 var cookieParser = require('cookie-parser');
 
-console.log("im working");
+//console.log("im working");
 
 var client_id = 'b983f92b754f48b9bceedc96df9dcb35'; // Your client id
 var client_secret = '6520ecb0ba104690a7c9dab84fc24cb4'; // Your secret
