@@ -14,9 +14,14 @@ var querystring = require('querystring');
 var cookieParser = require('cookie-parser');
 
 var client_id = 'b983f92b754f48b9bceedc96df9dcb35'; // Your client id
+<<<<<<< HEAD
 var client_secret = ''; // Your secret
 //var redirect_uri = 'https://mood-sort.herokuapp.com/callback'; // Your redirect uri
 var redirect_uri = 'http://localhost:8888/callback'; // Your redirect uri
+=======
+var redirect_uri = 'https://mood-sort.herokuapp.com/callback'; // Your redirect uri
+//var redirect_uri = 'http://localhost:8888/callback'; // Your redirect uri
+>>>>>>> 538ce16c9842e08a4485df73d80f7df95470495d
 
 /**
  * Generates a random string containing numbers and letters
