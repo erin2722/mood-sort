@@ -64,13 +64,11 @@ class Header extends Component {
         } else {
             return(
                 <Wrapper>
-                    <Title>
-                        <HappyFace />
-                        <LovingFace />
-                        <TitleBold>mood</TitleBold><TitleNotBold>-sort</TitleNotBold>
-                        <AngryFace />
-                        <SadFace />
-                    </Title>
+                    <Head isMobile = {this.props.isMobile}>
+                        <FaceWrapper><HappyFace /><LovingFace /></FaceWrapper>
+                        <Title><TitleBold>mood</TitleBold><TitleNotBold>-sort</TitleNotBold></Title>
+                        <FaceWrapper><AngryFace /><SadFace /></FaceWrapper>
+                    </Head>
                     <Description>sort large, unkept playlists into smaller playlists by mood</Description>
                     <br></br><br></br>
                     <Description>log into spotify to get started</Description>
