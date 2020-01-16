@@ -14,14 +14,9 @@ var querystring = require('querystring');
 var cookieParser = require('cookie-parser');
 
 var client_id = 'b983f92b754f48b9bceedc96df9dcb35'; // Your client id
-<<<<<<< HEAD
-var client_secret = ''; // Your secret
-//var redirect_uri = 'https://mood-sort.herokuapp.com/callback'; // Your redirect uri
-var redirect_uri = 'http://localhost:8888/callback'; // Your redirect uri
-=======
+var client_secret = '6520ecb0ba104690a7c9dab84fc24cb4'; // Your secret
 var redirect_uri = 'https://mood-sort.herokuapp.com/callback'; // Your redirect uri
 //var redirect_uri = 'http://localhost:8888/callback'; // Your redirect uri
->>>>>>> 538ce16c9842e08a4485df73d80f7df95470495d
 
 /**
  * Generates a random string containing numbers and letters
@@ -42,20 +37,20 @@ var stateKey = 'spotify_auth_state';
 
 var app = express();
 
-// Express only serves static assets in production
-// if (process.env.NODE_ENV === "production") {
-//   app.use(express.static("client/build"))
-//   .use(cookieParser())
-//   .use(cors());
-// } else {
-//   app.use(express.static(__dirname + '/public'))
-//   .use(cookieParser())
-//   .use(cors());
-// }
+//Express only serves static assets in production
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static("client/build"))
+  .use(cookieParser())
+  .use(cors());
+} else {
+  app.use(express.static(__dirname + '/public'))
+  .use(cookieParser())
+  .use(cors());
+}
 
-app.use(express.static(__dirname + '/public'))
-.use(cookieParser())
-.use(cors());
+// app.use(express.static(__dirname + '/public'))
+// .use(cookieParser())
+// .use(cors());
 
 app.get('/login', function(req, res) {
 
@@ -121,8 +116,8 @@ app.get('/callback', function(req, res) {
         });
         console.log(access_token);
         // we can also pass the token to the browser to make requests from there
-        res.redirect('http://localhost:3000/#' +
-        //res.redirect('/#' +
+        //res.redirect('http://localhost:3000/#' +
+        res.redirect('/#' +
           querystring.stringify({
             access_token: access_token,
             refresh_token: refresh_token
