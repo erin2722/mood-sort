@@ -6,7 +6,7 @@ import PlaylistForm from './components/PlaylistForm.jsx';
 import MoodForm from './components/MoodForm.jsx';
 import GoButton from './components/GoButton.jsx';
 import LogInButton from './components/LogInButton.jsx';
-// import SortForm from './components/sortForm.jsx';
+
 
 const spotifyWebAPI = new SpotifyWebAPI();
 
@@ -302,20 +302,22 @@ class App extends Component {
   render() {
     if(this.state.loggedIn) {
       return (
-        <Wrapper className="App">
-          <Header loggedIn = {true} />
-          <FormWrapper isMobile = {this.state.isMobile}>
-            <PlaylistForm 
-              titles = {this.state.playlists} 
-              handlePlaylistChange = {this.handlePlaylistChange} 
-              value = {this.state.chosenPlaylist.id} />
-            <MoodForm 
-              moods = {moods} 
-              handleMoodChange = {this.handleMoodChange} 
-              checkedItems = {this.state.moods} /> 
-          </FormWrapper>
-          <GoButton onClick = {() => this.goButtonClicked()} />
-        </Wrapper>
+        <div className="App">
+          <Wrapper>
+            <Header loggedIn = {true} />
+            <FormWrapper isMobile = {this.state.isMobile}>
+              <PlaylistForm 
+                titles = {this.state.playlists} 
+                handlePlaylistChange = {this.handlePlaylistChange} 
+                value = {this.state.chosenPlaylist.id} />
+              <MoodForm 
+                moods = {moods} 
+                handleMoodChange = {this.handleMoodChange} 
+                checkedItems = {this.state.moods} /> 
+            </FormWrapper>
+            <GoButton onClick = {() => this.goButtonClicked()} />
+          </Wrapper>
+        </div>
       );
     } else {
         return (

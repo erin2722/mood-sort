@@ -2,7 +2,10 @@ import React from 'react';
 import Checkbox from './Checkbox.jsx';
 import styled from 'styled-components';
   
-const Wrapper = styled.div``;
+const Wrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
 
 const Label = styled.div`
   display: flex;
@@ -12,6 +15,10 @@ const Label = styled.div`
 
 const Text = styled.span`
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+`;
+
+const Heading = styled.div`
+
 `;
 
 class MoodForm extends React.Component {
@@ -32,6 +39,7 @@ class MoodForm extends React.Component {
   render() {
     return (
       <Wrapper>
+        <Heading>Choose the Moods You Want Your Playlist Sorted Into:</Heading>
         {
           this.props.moods.map(item => (
             <Label>

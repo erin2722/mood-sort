@@ -13,6 +13,7 @@ const Form = styled.select`
   border-radius: 10px;
   padding: 5px;
   background-color: #BBBEFF;
+  width: 140px;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
   font-size: 14px;
   :focus {
@@ -27,6 +28,10 @@ const Option = styled.option`
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
   font-size:  14px;
   `;
+
+const Label = styled.div`
+  margin-bottom: 10px;
+`;
 
 class PlaylistForm extends Component {
     constructor(props) {
@@ -45,6 +50,7 @@ class PlaylistForm extends Component {
     render() {
         return (
           <Wrapper>
+                <Label>Choose One of Your Playlists to Sort:</Label>
                 <Form value={this.props.value} onChange={this.handleChange}>
                   <Option value = ''>Choose a Playlist</Option>
                   <Option name = "liked" value="liked">Liked Songs</Option>
