@@ -40,7 +40,7 @@ var moods = [
     label: 'chill',
   },   
   {
-    name: 'bag',
+    name: 'sad',
     key: 3,
     label: 'bag',
   },   
@@ -77,7 +77,7 @@ class App extends Component {
   }
 
   componentDidMount() {
-    this.getPlaylists();
+    this.getPlaylists(50, 0);
     this.getSavedSongs(50, 0);
 
     this.updateWindowDimensions();
@@ -113,9 +113,10 @@ class App extends Component {
       })
   }
 
-  getPlaylists() {
-    spotifyWebAPI.getUserPlaylists()
+  getPlaylists(limit, offset) {
+    spotifyWebAPI.getUserPlaylists({ limit: limit , offset: offset })
       .then((response) => {
+        console.log(response.total);
         var playlist;
         for(playlist of response.items) {
             this.setState(state => {
@@ -124,12 +125,12 @@ class App extends Component {
                 id: playlist.id,
                 length: playlist.tracks.total
             });
-            console.log(playlist.tracks.total);
             return {
               playlists
             }
           })
         }
+        if(this.state.playlists.length < response.total) this.getPlaylists(limit, offset + limit); 
       })
   }
 
@@ -154,8 +155,6 @@ class App extends Component {
         if(this.state.selectedPlaylistSongs.length < response.total) this.getSavedSongs(limit, offset + limit); 
       })
   }
-
-  //ONLY GETS FIRST 100
 
     getPlaylistSongs(playlistID) {
     var result = this.state.playlists.find(obj => {
@@ -261,7 +260,7 @@ class App extends Component {
           moodNames.map(mood => {
           spotifyWebAPI.createPlaylist(this.state.userID, {name: mood + " songs of " + this.state.chosenPlaylist.name, description: "Created by mood-sort from " + this.state.chosenPlaylist.name + " playlist"})
             .then((response) =>{
-              if(mood === 'bag' && bagURIs[0].length !== 0) {
+              if(mood === 'sad' && bagURIs[0].length !== 0) {
                 bagURIs.map(bagURI => {
                 spotifyWebAPI.addTracksToPlaylist('', response.id, bagURI)});
               } else if(mood === 'hype' && hypeURIs[0].length !== 0) {
@@ -304,7 +303,7 @@ class App extends Component {
       return (
         <div className="App">
           <Wrapper>
-            <Header loggedIn = {true} />
+            <Header loggedIn = {true} isMobile = {this.state.isMobile} />
             <FormWrapper isMobile = {this.state.isMobile}>
               <PlaylistForm 
                 titles = {this.state.playlists} 
@@ -322,7 +321,7 @@ class App extends Component {
     } else {
         return (
           <Wrapper className="App">
-            <Header loggedIn = {false} />
+            <Header loggedIn = {false} isMobile = {this.state.isMobile} />
             <LogInButton />
           </Wrapper>
         );
@@ -331,48 +330,3 @@ class App extends Component {
 }
 
 export default App;
-
-
-  // makeNewPlaylist(name) {
-  //   spotifyWebAPI.createPlaylist(this.state.userID, {name: name, description: "Created by mood-sort from " + this.state.chosenPlaylist.id + " playlist"})
-  //     .then((response) =>{
-  //       this.setState({
-  //         recentPlaylistID: response.id
-  //       })
-  //     });
-  // }
-
-    // addSong(songs, mood) {
-  //   spotifyWebAPI.addTracksToPlaylist('', mood, songs);
-  // }
-
-  // classifyByMood(song) {
-  //     var mood;
-  //     var playlist;
-  //     spotifyWebAPI.getAudioFeaturesForTrack(song.id)
-  //       .then((response) => {
-  //         //console.log(song.name, " Tempo ", response.tempo, " Energy ", response.energy, " Dancability ", response.danceability, " Valence ", response.valence);
-  //         if(response.danceability > .750 && response.tempo < .750) mood = "good vibes";
-  //         else if(response.danceability > .750) mood = "hype";
-  //         else if(response.tempo < 110 && response.energy < .400) mood = "chill";
-  //         else mood = "bag";
-
-  //         console.log(mood);
-          
-  //         return mood;
-  //       });
-  // }
-
-  
-  // createMoodPlaylists() {
-  //   //check mood form and create playlists in user's account accordingly
-  //   var mood;
-  //   for(mood of this.state.moods) {
-  //     if(this.makeNewPlaylist(mood[0] + " songs from " + this.state.chosenPlaylist.name)) {
-  //       this.setState(prevState => ({ moods: prevState.moods.set(mood[0], mood[1], true) }))
-  //     }
-  //   }
-
-  //   this.getPlaylists();
-
-  // }
