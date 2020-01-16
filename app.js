@@ -8,18 +8,15 @@
  */
 
 var express = require('express'); // Express web server framework
-const bodyParser = require('body-parser');
-const pino = require('express-pino-logger')();
 var request = require('request'); // "Request" library
 var cors = require('cors');
 var querystring = require('querystring');
 var cookieParser = require('cookie-parser');
 
-//console.log("im working");
-
 var client_id = 'b983f92b754f48b9bceedc96df9dcb35'; // Your client id
 var client_secret = '6520ecb0ba104690a7c9dab84fc24cb4'; // Your secret
-var redirect_uri = 'http://localhost:8888/callback'; // Your redirect uri
+var redirect_uri = 'https://mood-sort.herokuapp.com/callback'; // Your redirect uri
+//var redirect_uri = 'http://localhost:8888/callback'; // Your redirect uri
 
 /**
  * Generates a random string containing numbers and letters
@@ -40,17 +37,16 @@ var stateKey = 'spotify_auth_state';
 
 var app = express();
 
-app.use(express.static(__dirname + '/public'))
-   .use(cors())
-   .use(cookieParser())
-   .use(bodyParser.urlencoded({ extended: false }))
-   .use(pino);
-
-app.get('/api/greeting', (req, res) => {
-    const name = req.query.name || 'World';
-    res.setHeader('Content-Type', 'application/json');
-    res.send(JSON.stringify({ greeting: `Hello ${name}!` }));
-});
+// Express only serves static assets in production
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static("client/build"))
+  .use(cookieParser())
+  .use(cors());
+} else {
+  app.use(express.static(__dirname + '/public'))
+  .use(cookieParser())
+  .use(cors());
+}
 
 app.get('/login', function(req, res) {
 
@@ -58,7 +54,7 @@ app.get('/login', function(req, res) {
   res.cookie(stateKey, state);
 
   // your application requests authorization
-  var scope = 'user-read-private user-read-email playlist-read-private user-library-read playlist-modify-public playlist-modify-private';
+  var scope = 'user-read-private user-read-email';
   res.redirect('https://accounts.spotify.com/authorize?' +
     querystring.stringify({
       response_type: 'code',
@@ -114,9 +110,10 @@ app.get('/callback', function(req, res) {
         request.get(options, function(error, response, body) {
           console.log(body);
         });
-
+        console.log(access_token);
         // we can also pass the token to the browser to make requests from there
-        res.redirect('http://localhost:3000/#' +
+        //res.redirect('https://mood-sort.s3.us-east-2.amazonaws.com/index.html' +
+        res.redirect('/#' +
           querystring.stringify({
             access_token: access_token,
             refresh_token: refresh_token
@@ -155,5 +152,9 @@ app.get('/refresh_token', function(req, res) {
   });
 });
 
-console.log('Listening on 8888');
-app.listen(8888);
+app.set( 'port', ( process.env.PORT || 8888 ));
+
+// Start node server
+app.listen( app.get( 'port' ), function() {
+  console.log( 'Node server is running on port ' + app.get( 'port' ));
+  });
