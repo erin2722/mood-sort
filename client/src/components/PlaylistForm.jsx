@@ -4,7 +4,8 @@ import styled from 'styled-components';
 const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
-  margin: 10px;
+  margin: ${props => props.isMobile ? "0px" : "10px" };
+  margin-bottom: 15px;
   margin-right: 100px;
 `;
 
@@ -49,7 +50,7 @@ class PlaylistForm extends Component {
 
     render() {
         return (
-          <Wrapper>
+          <Wrapper isMobile = {this.props.isMobile}>
                 <Label>Choose One of Your Playlists to Sort:</Label>
                 <Form value={this.props.value} onChange={this.handleChange}>
                   <Option value = ''>Choose a Playlist</Option>

@@ -6,6 +6,7 @@ import PlaylistForm from './components/PlaylistForm.jsx';
 import MoodForm from './components/MoodForm.jsx';
 import GoButton from './components/GoButton.jsx';
 import LogInButton from './components/LogInButton.jsx';
+import Alert from './components/Alert.jsx';
 
 
 const spotifyWebAPI = new SpotifyWebAPI();
@@ -15,7 +16,7 @@ const Wrapper = styled.div`
   flex-direction: column;
   justify-content: space-around;
   align-items: center;
-  margin: 50px;
+  margin: ${props => props.isMobile ? "20px" : "50px" };
 `;
 
 const FormWrapper = styled.div`
@@ -24,8 +25,7 @@ const FormWrapper = styled.div`
     justify-content: center;
     align-items: center;
     align-content: center;
-    margin: 50px;
-    margin-top: 50px;
+    margin: ${props => props.isMobile ? "5px" : "50px" };
 `;
 
 var moods = [
@@ -67,11 +67,13 @@ class App extends Component {
       moods: new Map(), 
       chosenPlaylist: {},
       numCreated: 0,
+      alert: false,
       isMobile: false
     }
 
     this.handleMoodChange = this.handleMoodChange.bind(this);
     this.handlePlaylistChange = this.handlePlaylistChange.bind(this);
+    this.handleAlertChange = this.handleAlertChange.bind(this); //in the middle of adding this
     this.getSavedSongs = this.getSavedSongs.bind(this);
     this.updateWindowDimensions = this.updateWindowDimensions.bind(this);
   }
@@ -273,6 +275,7 @@ class App extends Component {
                 chillURIs.map(chillURI => {
                 spotifyWebAPI.addTracksToPlaylist('', response.id, chillURI)});
               }
+              this.setState({ alert: true });
             })
         })
       })
@@ -289,6 +292,10 @@ class App extends Component {
     this.setState( { chosenPlaylist: {name: options[selectedIndex].innerHTML, id: e.target.value }} );
   }
 
+  handleAlertChange(e) {
+    this.setState( { alert: !this.state.alert } );
+  }
+
   goButtonClicked() {
       if(this.state.chosenPlaylist.id === 'liked') {
         this.sortSongs();
@@ -302,18 +309,21 @@ class App extends Component {
     if(this.state.loggedIn) {
       return (
         <div className="App">
-          <Wrapper>
+          <Wrapper isMobile = {this.state.isMobile}>
             <Header loggedIn = {true} isMobile = {this.state.isMobile} />
             <FormWrapper isMobile = {this.state.isMobile}>
               <PlaylistForm 
                 titles = {this.state.playlists} 
                 handlePlaylistChange = {this.handlePlaylistChange} 
-                value = {this.state.chosenPlaylist.id} />
+                value = {this.state.chosenPlaylist.id} 
+                isMobile = {this.state.isMobile}
+                />
               <MoodForm 
                 moods = {moods} 
                 handleMoodChange = {this.handleMoodChange} 
                 checkedItems = {this.state.moods} /> 
             </FormWrapper>
+            <Alert handleAlertChange = {this.handleAlertChange} alert = {this.state.alert} />
             <GoButton onClick = {() => this.goButtonClicked()} />
           </Wrapper>
         </div>
