@@ -1,28 +1,30 @@
-import React from 'react';
-import styled from 'styled-components';
+import React from "react";
+import styled from "styled-components";
 
 const Wrapper = styled.div`
-    position: absolute;
-    display: ${props => props.alert ? "flex" : "none" };
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    padding: 10px;
-    width: 50%;
-    background-color: #424FFF;
-    border-radius: 15px;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  position: absolute;
+  display: ${props => (props.alert ? "flex" : "none")};
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  padding: 10px;
+  width: 50%;
+  background-color: #424fff;
+  border-radius: 15px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+    sans-serif;
 `;
 
 const Text = styled.div`
-    padding-bottom: 10px;
+  padding-bottom: 10px;
 `;
 
 const Button = styled.button`
-    cursor: pointer;
-    color: white;
-    background-color: #424FFF;
+  cursor: pointer;
+  color: white;
+  background-color: #424fff;
 `;
 
 class Alert extends React.Component {
@@ -39,9 +41,9 @@ class Alert extends React.Component {
 
   render() {
     return (
-      <Wrapper alert = {this.props.alert}>
+      <Wrapper alert={this.props.alert}>
         <Text>Check You Spotify Account!</Text>
-        <Button onClick = {this.handleChange}>Close</Button>
+        <Button onClick={this.handleChange}>Close</Button>
       </Wrapper>
     );
   }

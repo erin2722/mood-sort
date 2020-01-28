@@ -1,7 +1,7 @@
-import React from 'react';
-import Checkbox from './Checkbox.jsx';
-import styled from 'styled-components';
-  
+import React from "react";
+import Checkbox from "./Checkbox.jsx";
+import styled from "styled-components";
+
 const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
@@ -14,20 +14,20 @@ const Label = styled.div`
 `;
 
 const Text = styled.span`
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+    sans-serif;
 `;
 
-const Heading = styled.div`
-
-`;
+const Heading = styled.div``;
 
 class MoodForm extends React.Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      checkedItems: new Map(),
-    }
+      checkedItems: new Map()
+    };
 
     this.handleChange = this.handleChange.bind(this);
   }
@@ -40,14 +40,16 @@ class MoodForm extends React.Component {
     return (
       <Wrapper>
         <Heading>Choose the Moods You Want Your Playlist Sorted Into:</Heading>
-        {
-          this.props.moods.map(item => (
-            <Label>
-              <Checkbox name={item.name} checked={this.props.checkedItems.get(item.name)} onChange={this.handleChange} />
-              <Text>{item.name}</Text>
-            </Label>
-          ))
-        }
+        {this.props.moods.map(item => (
+          <Label>
+            <Checkbox
+              name={item.name}
+              checked={this.props.checkedItems.get(item.name)}
+              onChange={this.handleChange}
+            />
+            <Text>{item.name}</Text>
+          </Label>
+        ))}
       </Wrapper>
     );
   }
